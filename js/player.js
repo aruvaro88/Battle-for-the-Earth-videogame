@@ -15,6 +15,13 @@ class Player {
         this.bullet = []
         this.bulletWidth = 180
         this.bulletHeight = 70
+        this.isInvincible = false
+        this.invincible = new Image()
+        this.invincible.src = "img/player-animation.png"
+        this.invincibleWidth = 204
+        this.invincibleHeight = 170
+        this.invincible.frames = 2
+        this.invincible.framesIndex = 0
         this.fx = new Audio('sounds/big-laser.wav')
         this.diffSrc = "img/player-bullet-animation.png"
         this.keyState = {
@@ -25,7 +32,11 @@ class Player {
         }
     }
     draw(framesCounter) {
-        this.ctx.drawImage(this.image, this.posX, this.posY, this.width, this.height)
+        if (this.isInvincible) {
+            this.drawInvincible(framesCounter)
+        } else {
+            this.ctx.drawImage(this.image, this.posX, this.posY, this.width, this.height)
+        }
         this.bullet.forEach(elm => elm.draw(framesCounter))
         this.clearBullets()
 
@@ -35,10 +46,6 @@ class Player {
         this.keyState.keyLeft === true ? this.posX -= this.speed : null
         this.keyState.keyUp === true ? this.posY -= this.speed : null
         this.keyState.keyDown === true ? this.posY += this.speed : null
-        // dir === 'right' ? this.posX += this.speed : null
-        // dir === 'left' ? this.posX -= this.speed : null
-        // dir === 'up' ? this.posY -= this.speed : null
-        // dir === 'down' ? this.posY += this.speed : null
     }
 
     shoot() {
@@ -69,5 +76,27 @@ class Player {
     }
     clearBullets() {
         this.bullet = this.bullet.filter(elm => elm.posX <= game.canvasSize.width)
+    }
+    drawInvincible(framesCounter) {
+        this.ctx.drawImage(
+            this.invincible,
+            this.invincible.framesIndex * Math.floor(this.invincibleWidth / this.invincible.frames),
+            0,
+            Math.floor(this.invincibleWidth / this.invincible.frames),
+            this.invincibleHeight,
+            this.posX,
+            this.posY,
+            this.width,
+            this.height)
+        this.animatePlayer(framesCounter)
+    }
+    animatePlayer(framesCounter) {
+        if (framesCounter % 4 == 0) {
+            this.invincible.framesIndex++;
+        }
+        if (this.invincible.framesIndex === this.invincible.frames) {
+            this.invincible.framesIndex = 0;
+
+        }
     }
 }

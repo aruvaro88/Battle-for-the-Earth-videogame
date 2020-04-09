@@ -40,7 +40,6 @@ const game = {
         this.reset()
         this.setEventListeners()
         this.interval = setInterval(() => {
-            console.log(this.player.posX, this.player.posY, this.canvasSize.width, this.canvasSize.height)
             this.framesCounter++
             if (this.framesCounter > 5000) {
                 this.framesCounter = 0;
@@ -134,12 +133,6 @@ const game = {
                 }
             }
         }
-
-
-
-
-
-
         // if (this.player.posX < this.canvasSize.width - this.player.width) {
         //     e.keyCode === 37 ? this.player.keyState.keyRight = true : null
         // }
@@ -234,7 +227,10 @@ const game = {
 
     checkCollision() {
         this.enemy.filter(enm => enm.isExploding == false).forEach((enm) => {
-            this.isCollision(this.player, enm) ? (this.reduceLives(this.player), enm.onScreen = false) : null //check colisiones jugador-enemigo
+            if (this.isCollision(this.player, enm) ) {
+                this.player.isInvincible === false ? this.reduceLives(this.player) : null
+                enm.onScreen = false
+            } //check colisiones jugador-enemigo
 
             this.player.bullet.forEach((bull) => { //check colisiones de las balas del jugador
                 if (this.isCollision(bull, enm)) { //bala del jugador vs enemigos
@@ -243,7 +239,10 @@ const game = {
                 }
             })
             enm.enemyBullet.forEach((ebull) => { //check colisiones balas del enemigo vs jugador
-                this.isCollision(ebull, this.player) ? (this.reduceLives(this.player), ebull.onScreen = false) : null
+                if (this.isCollision(ebull, this.player)) {
+                    this.player.isInvincible === false ? this.reduceLives(this.player) : null
+                    ebull.onScreen = false
+                }
                 this.player.bullet.forEach((bull) => {
                     if (this.isCollision(ebull, bull)) {
                         ebull.onScreen = false
@@ -294,6 +293,11 @@ const game = {
         player.lives--
         player.posX = 30
         player.posY = this.canvasSize.height / 2
+        player.isInvincible = true
+         setTimeout(() => {
+             player.isInvincible = false
+             player.draw(this.framesCounter)
+         }, 2500)
         if (player.lives == 0) {
             this.gameOver()
         }
