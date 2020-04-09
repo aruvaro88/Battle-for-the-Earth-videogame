@@ -64,8 +64,8 @@ class SpeedEnemy {
             this.explosionHeight,
             this.posX,
             this.posY,
-            125,
-            125)
+            this.width,
+            this.height)
         this.animateExplosion(framesCounter)
     }
     animateExplosion(framesCounter) {
