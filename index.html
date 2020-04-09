@@ -4,19 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/style.css" />
     <title>Document</title>
 </head>
 
 <body>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
-
     <canvas id="myCanvas"></canvas>
-
+    <div id="game">
+        <header class="title">
+            <div>
+                <img src="img/main-title.png">
+            </div>
+        </header>
+        <main id="instructions">
+            <img src="img/controls.png" id="ctrl-window">
+            <div class="button">
+                <img src="img/Start_BTN.png" id="start-btn">
+            </div>
+        </main>
+    </div>
 
     <script src="js/enemy-bullet.js"></script>
     <script src="js/bullets.js"></script>

@@ -11,11 +11,26 @@ class BasicEnemy {
         this.speed = 6
         this.armor = 2
         this.enemyBullet = []
+        this.bulletWidth = 180
+        this.bulletHeight = 70
+        this.fx = new Audio('sounds/enemy-shoot.wav')
+        this.explosion = new Image()
+        this.explosion.src = "img/explosion-animation.png"
+        this.explosionFx = new Audio('sounds/enemy-explosion.wav')
+        this.isExploding = false
+        this.explosionWidth = 1250
+        this.explosionHeight = 125
+        this.explosion.frames = 10
+        this.explosion.framesIndex = 0
     }
     draw(bulletCounter) {
-        this.ctx.drawImage(this.image, this.posX, this.posY, this.width, this.height)
+        if (this.isExploding) {
+            this.drawExplosion(bulletCounter)
+        } else {
+            this.ctx.drawImage(this.image, this.posX, this.posY, this.width, this.height)
+        }
         this.move()
-        this.enemyBullet.forEach(elm => elm.draw())
+        this.enemyBullet.forEach(elm => elm.draw(bulletCounter))
         if (bulletCounter % 100 === 0) {
             this.shoot()
         }
@@ -25,9 +40,33 @@ class BasicEnemy {
         this.posX -= this.speed
     }
     shoot() {
-        this.enemyBullet.push(new EnemyBullets(this.ctx, this.posX-this.width, this.posY, "img/enemy-bullet.png"))
+        this.fx.play()
+        this.enemyBullet.push(new EnemyBullets(this.ctx, this.posX - this.width, this.posY, this.bulletWidth, this.bulletHeight, "img/enemy-bullet-animation.png"))
     }
     clearBullets() {
         this.enemyBullet = this.enemyBullet.filter(elm => elm.posX + elm.width > 0)
+    }
+    drawExplosion(framesCounter) {
+        this.explosionFx.play()
+        this.ctx.drawImage(
+            this.explosion,
+            this.explosion.framesIndex * Math.floor(this.explosionWidth / this.explosion.frames),
+            0,
+            Math.floor(this.explosionWidth / this.explosion.frames),
+            this.explosionHeight,
+            this.posX,
+            this.posY,
+            125,
+            125)
+        this.animateExplosion(framesCounter)
+    }
+    animateExplosion(framesCounter) {
+        if (framesCounter % 8 == 0) {
+            this.explosion.framesIndex++;
+        }
+        if (this.explosion.framesIndex === this.explosion.frames) {
+            this.explosion.framesIndex = 0;
+
+        }
     }
 }

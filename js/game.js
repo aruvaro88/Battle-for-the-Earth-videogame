@@ -16,11 +16,12 @@ const game = {
     powerUpImpact: [],
     powerUpLives: [],
     enemiesDestroyed: 0,
+    music: new Audio('sounds/Arcade-Fantasy.mp3'),
+    powerUpFx: new Audio('sounds/power-up.wav'),
     canvasSize: {
         width: window.innerWidth,
-        height: window.innerHeight - 1
+        height: window.innerHeight
     },
-
     init() {
         this.canvasDom = document.getElementById("myCanvas")
         this.ctx = this.canvasDom.getContext("2d")
@@ -34,11 +35,12 @@ const game = {
     },
 
     start() {
-        // let music = new Audio('/sounds/music-background.wav')
-        // music.play()
+        this.music.loop = true
+        this.music.play()
         this.reset()
         this.setEventListeners()
         this.interval = setInterval(() => {
+            console.log(this.player.posX, this.player.posY, this.canvasSize.width, this.canvasSize.height)
             this.framesCounter++
             if (this.framesCounter > 5000) {
                 this.framesCounter = 0;
@@ -50,6 +52,7 @@ const game = {
             this.checkCollision()
             this.clearEnemyLeft()
             this.clearEnemyRight()
+            this.player.move()
         }, 1000 / this.fps)
     },
 
@@ -65,7 +68,7 @@ const game = {
 
     drawAll() {
         this.background.draw()
-        this.player.draw()
+        this.player.draw(this.framesCounter)
         this.enemy.forEach(elm => elm.draw(this.framesCounter))
         this.powerUpBullet.forEach(pow => pow.draw())
         this.powerUpImpact.forEach(pow => pow.draw())
@@ -74,26 +77,97 @@ const game = {
         this.ctx.textBaseline = 'bottom'
         this.ctx.fillText(`Lives: ${this.player.lives}`, 10, game.canvasSize.height)
         this.ctx.fillText(`Enemies Destroyed: ${this.enemiesDestroyed}`, 200, game.canvasSize.height)
-
-
     },
 
     setEventListeners() {
         document.onkeydown = e => {
-            if (this.player.posX < this.canvasSize.width - this.player.width) {
-                e.keyCode === 39 ? this.player.move('right') : null
+            switch (e.keyCode) {
+                case 39:
+                    if (this.player.posX + this.player.width < this.canvasSize.width) {
+                        this.player.keyState.keyRight = true
+                    } else {
+                        this.player.keyState.keyRight = false
+                    }
+                    break;
+                case 37:
+                    if (this.player.posX >= 0) {
+                        this.player.keyState.keyLeft = true
+                    } else {
+                        this.player.keyState.keyLeft = false
+                    }
+                    break;
+                case 38:
+                    if (this.player.posY > 0) {
+                        this.player.keyState.keyUp = true
+                    } else {
+                        this.player.keyState.keyUp = false
+                    }
+                    break;
+                case 40:
+                    if (this.player.posY + this.player.height < this.canvasSize.height) {
+                        this.player.keyState.keyDown = true
+                    } else {
+                        this.player.keyState.keyDown = false
+                    }
+                    break;
+                case 32:
+                    e.keyCode === 32 ? this.player.shoot() : null
+                    break;
             }
-            if (this.player.posX > 0) {
-                e.keyCode === 37 ? this.player.move('left') : null
+            document.onkeyup = e => {
+                switch (e.keyCode) {
+                    case 39:
+                        this.player.keyState.keyRight = false
+                        break;
+                    case 37:
+                        this.player.keyState.keyLeft = false
+                        break;
+                    case 38:
+                        this.player.keyState.keyUp = false
+                        break;
+                    case 40:
+                        this.player.keyState.keyDown = false
+                        break;
+                    case 32:
+                        e.keyCode === 32 ? this.player.shoot() : null
+                        break;
+                }
             }
-            if (this.player.posY > 0) {
-                e.keyCode === 38 ? this.player.move('up') : null
-            }
-            if (this.player.posY < this.canvasSize.height - this.player.height) {
-                e.keyCode === 40 ? this.player.move('down') : null
-            }
-            e.keyCode === 32 ? this.player.shoot() : null
         }
+
+
+
+
+
+
+        // if (this.player.posX < this.canvasSize.width - this.player.width) {
+        //     e.keyCode === 37 ? this.player.keyState.keyRight = true : null
+        // }
+        // if (this.player.posX > 0) {
+        //     e.keyCode === 39 ? this.player.keyState.keyLeft = true : null
+        // }
+        // if (this.player.posY > 0) {
+        //     e.keyCode === 38 ? this.player.keyState.keyUp = true : null
+        // }
+        // if (this.player.posY < this.canvasSize.height - this.player.height) {
+        //     e.keyCode === 40 ? this.player.keyState.keyDown = true : null
+        // }
+        // e.keyCode === 32 ? this.player.shoot() : null
+
+        // document.onkeyup = e => {
+        //     if (this.player.posX < this.canvasSize.width - this.player.width) {
+        //         e.keyCode === 37 ? this.player.keyState.keyRight = false : null
+        //     }
+        //     if (this.player.posX > 0) {
+        //         e.keyCode === 39 ? this.player.keyState.keyLeft = false : null
+        //     }
+        //     if (this.player.posY > 0) {
+        //         e.keyCode === 38 ? this.player.keyState.keyUp = false : null
+        //     }
+        //     if (this.player.posY < this.canvasSize.height - this.player.height) {
+        //         e.keyCode === 40 ? this.player.keyState.keyDown = false : null
+        //     }
+        // }
     },
     generatePowerUp() {
         if (this.framesCounter % 1000 == 0) {
@@ -111,21 +185,24 @@ const game = {
     },
     generateEnemy() {
         //si aparece final boss detener la generacion de enemigos
-        if (this.framesCounter % 150 == 0) {
-            this.enemy.push(new BasicEnemy(this.ctx, "img/basic-enemy.png"))
-        }
-        if (this.framesCounter % 400 == 0) {
-            this.enemy.push(new SpeedEnemy(this.ctx, "img/speed-enemy.png"))
-        }
-        if (this.framesCounter % 900 == 0) {
-            this.enemy.push(new HeavyEnemy(this.ctx, "img/heavy-enemy.png"))
-        }
-        if (this.framesCounter % 2000 == 0) {
-            this.enemy.push(new MotherEnemy(this.ctx, "img/mother-enemy.png"))
-        }
-        if (this.enemiesDestroyed == 30) {
-            this.enemiesDestroyed = 0
-            this.enemy.push(new FinalBoss(this.ctx, "img/final-boss.png"))
+        let prob = Math.floor(Math.random() * (21 - 1) + 1)
+        if (this.framesCounter % 100 == 0) {
+            //if generate enemies == true
+            if (prob >= 1 && prob <= 8) {
+                this.enemy.push(new BasicEnemy(this.ctx, "img/basic-enemy.png"))
+            }
+            if (prob >= 9 && prob <= 13) {
+                this.enemy.push(new SpeedEnemy(this.ctx, "img/speed-enemy.png"))
+            }
+            if (prob >= 14 && prob <= 17) {
+                this.enemy.push(new HeavyEnemy(this.ctx, "img/heavy-enemy.png"))
+            }
+            if (prob >= 18 && prob <= 19) {
+                this.enemy.push(new MotherEnemy(this.ctx, "img/mother-enemy.png"))
+            }
+            if (prob == 20) {
+                this.enemy.push(new FinalBoss(this.ctx, "img/final-boss.png"))
+            }
         }
     },
 
@@ -156,7 +233,7 @@ const game = {
     },
 
     checkCollision() {
-        this.enemy.forEach((enm) => {
+        this.enemy.filter(enm => enm.isExploding == false).forEach((enm) => {
             this.isCollision(this.player, enm) ? (this.reduceLives(this.player), enm.onScreen = false) : null //check colisiones jugador-enemigo
 
             this.player.bullet.forEach((bull) => { //check colisiones de las balas del jugador
@@ -175,20 +252,25 @@ const game = {
                 })
             })
         })
-        this.powerUpBullet.forEach((pow) => {
+        this.powerUpImpact.forEach((pow) => {
             if (this.isCollision(pow, this.player)) {
-                this.player.bulletAmount === 3 ? this.player.bulletAmount = 3 : this.player.bulletAmount++
+                this.powerUpFx.play()
+                this.player.bulletImpact === 2 ? this.player.bulletImpact = 2 : this.player.bulletImpact++
+                this.player.bulletType = "special"
                 pow.onScreen = false
             }
         })
-        this.powerUpImpact.forEach((pow) => {
+        this.powerUpBullet.forEach((pow) => {
             if (this.isCollision(pow, this.player)) {
-                this.player.bulletImpact === 2 ? this.player.bulletImpact = 2 : this.player.bulletImpact++
+                this.powerUpFx.play()
+                this.player.bulletAmount === 3 ? this.player.bulletAmount = 3 : this.player.bulletAmount++
+                this.player.bulletType = "normal"
                 pow.onScreen = false
             }
         })
         this.powerUpLives.forEach((pow) => {
             if (this.isCollision(pow, this.player)) {
+                this.powerUpFx.play()
                 this.player.lives++
                 pow.onScreen = false
             }
@@ -198,15 +280,20 @@ const game = {
 
     reduceArmor(enemy) {
         enemy.armor -= this.player.bulletImpact
-        if (enemy.armor == 0) {
-            enemy.onScreen = false
+        if (enemy.armor <= 0) {
+            enemy.isExploding = true
+            setTimeout(() => {
+                enemy.onScreen = false
+            }, 1000)
+            this.enemy.forEach(elm => elm.drawExplosion(this.framesCounter))
             this.enemiesDestroyed++
         }
     },
 
     reduceLives(player) {
         player.lives--
-        console.log(player.lives)
+        player.posX = 30
+        player.posY = this.canvasSize.height / 2
         if (player.lives == 0) {
             this.gameOver()
         }

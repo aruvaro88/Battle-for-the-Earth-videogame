@@ -5,7 +5,7 @@ class PowerUp {
         this.posY = Math.floor(Math.random() * Math.floor(game.canvasSize.height))
         this.width = 70
         this.height = 70
-        this.speed = 1
+        this.speed = 3
         this.direction = 1
         this.onScreen = true
         this.image = new Image()
