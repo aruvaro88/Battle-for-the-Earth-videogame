@@ -171,16 +171,14 @@ const game = {
             if (prob >= 7 && prob <= 9) {
                 this.powerUpBullet.push(new PowerUp(this.ctx, "img/Rockets_Bonus.png"))
             }
-            if (prob == 10) {
+            if (prob === 10) {
                 this.powerUpLives.push(new PowerUp(this.ctx, "img/HP_Bonus.png"))
             }
         }
     },
     generateEnemy() {
-        //si aparece final boss detener la generacion de enemigos
         let prob = Math.floor(Math.random() * (21 - 1) + 1)
         if (this.framesCounter % 100 == 0) {
-            //if generate enemies == true
             if (prob >= 1 && prob <= 8) {
                 this.enemy.push(new BasicEnemy(this.ctx, "img/basic-enemy.png"))
             }
@@ -227,10 +225,10 @@ const game = {
 
     checkCollision() {
         this.enemy.filter(enm => enm.isExploding == false).forEach((enm) => {
-            if (this.isCollision(this.player, enm) ) {
+            if (this.isCollision(this.player, enm)) { //check colisiones jugador-enemigo
                 this.player.isInvincible === false ? this.reduceLives(this.player) : null
                 enm.onScreen = false
-            } //check colisiones jugador-enemigo
+            }
 
             this.player.bullet.forEach((bull) => { //check colisiones de las balas del jugador
                 if (this.isCollision(bull, enm)) { //bala del jugador vs enemigos
@@ -284,7 +282,7 @@ const game = {
             setTimeout(() => {
                 enemy.onScreen = false
             }, 1000)
-            this.enemy.forEach(elm => elm.drawExplosion(this.framesCounter))
+            this.enemy.forEach(elm => elm.draw(this.framesCounter))
             this.enemiesDestroyed++
         }
     },
@@ -294,10 +292,10 @@ const game = {
         player.posX = 30
         player.posY = this.canvasSize.height / 2
         player.isInvincible = true
-         setTimeout(() => {
-             player.isInvincible = false
-             player.draw(this.framesCounter)
-         }, 2500)
+        setTimeout(() => {
+            player.isInvincible = false
+            player.draw(this.framesCounter)
+        }, 2500)
         if (player.lives == 0) {
             this.gameOver()
         }

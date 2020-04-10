@@ -1,10 +1,10 @@
 class PowerUp {
     constructor(ctx, imgSrc) {
         this.ctx = ctx
-        this.posX = game.canvasSize.width
-        this.posY = Math.floor(Math.random() * Math.floor(game.canvasSize.height))
         this.width = 70
         this.height = 70
+        this.posX = game.canvasSize.width
+        this.posY = Math.floor(Math.random() * (game.canvasSize.height - this.height))
         this.speed = 3
         this.direction = 1
         this.onScreen = true

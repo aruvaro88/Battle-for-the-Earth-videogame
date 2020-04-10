@@ -22,6 +22,8 @@ class Player {
         this.invincibleHeight = 170
         this.invincible.frames = 2
         this.invincible.framesIndex = 0
+        this.isExploding = false
+        this.explosion = new Explosion(this.ctx, this.posX, this.posY, "img/explosion-animation.png")
         this.fx = new Audio('sounds/big-laser.wav')
         this.diffSrc = "img/player-bullet-animation.png"
         this.keyState = {
@@ -34,8 +36,12 @@ class Player {
     draw(framesCounter) {
         if (this.isInvincible) {
             this.drawInvincible(framesCounter)
+        }
+        else if (this.isExploding) {
+            this.explosion.draw(framesCounter, this.posX, this.posY)
         } else {
             this.ctx.drawImage(this.image, this.posX, this.posY, this.width, this.height)
+
         }
         this.bullet.forEach(elm => elm.draw(framesCounter))
         this.clearBullets()
@@ -91,12 +97,11 @@ class Player {
         this.animatePlayer(framesCounter)
     }
     animatePlayer(framesCounter) {
-        if (framesCounter % 4 == 0) {
+        if (framesCounter % 2 == 0) {
             this.invincible.framesIndex++;
         }
         if (this.invincible.framesIndex === this.invincible.frames) {
             this.invincible.framesIndex = 0;
-
         }
     }
 }
