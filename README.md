@@ -16,10 +16,10 @@ Spacebar -> shoot
 
 ## Enemies
 Battle for the Earth have four enemies with different moves and shooting styles each. You can apreciate they have different sizes. 
-Their spawn is controlled by probability.
+Their spawn is controlled by probability function.
 
 ## Power-Ups
-There are three different Power-Ups, with different effects over player.
+There are three different Power-Ups, with different effects over player. Their spawn is also controled by probability function
 ```bash
 +1 shooting impact
 +1 ship shooting
