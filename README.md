@@ -4,7 +4,7 @@ Battle for the Earth is a videogame programed in JavaScript. It has some HTML & 
 
 ## A videogame?
 
-This is my first programing project during Ironhack bootcamp in Madrid. This project consist in program a videogame from scratch. I love arcades, and thats why I choose to imitate arcade shooters.
+This is my first programing project during Ironhack bootcamp in Madrid. This project consist in program a videogame from scratch. I love arcades, and thats why I choose to imitate arcade shooters. You can play it in your browser here: [Battle for the Earth](https://aruvaro88.github.io/Battle-for-the-Earth-videogame/)
 
 
 ## Instructions
